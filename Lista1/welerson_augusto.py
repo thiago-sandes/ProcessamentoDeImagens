@@ -10,6 +10,17 @@
 #
 ########################################
 
+
+'''
+
+Lista 1 para a disciplina Processamento de Imagens . . .
+
+Periodo 2018-2
+
+
+'''
+
+
 import matplotlib 
 import numpy as np
 import matplotlib.image as mpimg
@@ -128,28 +139,38 @@ def showhist(h, Bin = 1):
 
 		ax1.bar3d(xpos, ypos, zpos, dx, dy, dz, color = 'red')
 		plt.show()
-	
+
+def histeq(img):
+	#Imagem de entrada
+	imshow(img)
+	data = img.copy().flatten()
+	hist, bins = np.histogram(data, 256, density=True)
+	cdf = hist.cumsum()
+	cdf = 255*cdf/cdf[-1]
+	img_eq = np.interp(data, bins[:-1], cdf)
+	imgOut = np.asarray(img_eq.reshape(img.shape), np.uint8)
+	#Imagem de saida
+ 	imshow(imgOut)
+	return imgOut
+
 ######### testes ############
-img1 = imread('in1.jpg')
-print (type(img1))
+#img1 = imread('in1.jpg')
+#print (type(img1))
 
 '''
 # Q2 printing image
 plt.imshow(img1)
 #plt.show()
-
 # Q3 pegando numero de canais
 nCh = nchannels(img1)
 print (nCh)
-
 # Q4 
 print (size(img1))
-
 # Q5
 img1Gray = rgb2gray(img1)
 '''
 # Q6
-img2 = imreadgray('in1.jpg')
+#img2 = imreadgray('in1.jpg')
 
 # Q7 imshow()
 #imshow(img1)
@@ -167,12 +188,12 @@ img2 = imreadgray('in1.jpg')
 #imshow(contrast(img2, 4, 20))
 
 # Q11
-h = hist(img1)
+#h = hist(img1)
 
 # Q12 e Q13
 #showhist(h)
 #showhist(h, 2)
 
 # Q14
-
-
+#img1 = imread('in1.jpg')
+#histeq(img1)
