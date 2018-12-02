@@ -1,3 +1,15 @@
+########################################
+#
+# Nome: WELERSON AUGUSTO LINO DE JESUS MELO
+# Matricula: 201600017230
+# E-mail: welerson.a.melo@gmail.com
+#
+# Nome: THIAGO JOSE SANDES MELO
+# Matricula: 201600092557	
+# E-mail: thiago_sandes@outlook.com
+#
+########################################
+
 import matplotlib 
 import numpy as np
 import matplotlib.image as mpimg
