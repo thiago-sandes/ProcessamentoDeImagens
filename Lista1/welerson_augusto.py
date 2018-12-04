@@ -153,6 +153,39 @@ def histeq(img):
  	imshow(imgOut)
 	return imgOut
 
+def convolve(img,kernel):
+	kernel = kernel[:, :, None]
+	out = []
+	imshow(img)
+	
+	for indexs,value in np.ndenumerate(img):
+
+		out += img[indexs] * kernel[indexs]
+
+	out = (out % 255)
+	imshow(out)
+
+	return out
+
+
+def maskBlur():
+	return np.asarray([[1/16,2/16,1/16],[2/16,4/16,2/16],[1/16,2/16,1/16]], np.float64)
+
+def blur(img):
+	imshow(img)
+	img_new = img * maskBlur()
+
+	#img_new = convolve(img, maskBlur())
+
+	imshow(img_new)
+	return img_new
+
+def seSquare3():
+	return np.asarray([[1,1,1],[1,1,1],[1,1,1]], np.uint8)
+
+def seCross3():
+	return np.asarray([[0,1,0],[1,1,1],[0,1,0]], np.uint8)
+
 ######### testes ############
 #img1 = imread('in1.jpg')
 #print (type(img1))
@@ -197,3 +230,12 @@ img1Gray = rgb2gray(img1)
 # Q14
 #img1 = imread('in1.jpg')
 #histeq(img1)
+
+# Q15
+# http://aishack.in/tutorials/image-convolution-examples/
+#img = imread('cinza.jpg')
+#kernel = np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]]) # Filtro Edge Detection 
+#convolve(img, kernel)
+
+# Q16
+#maskBlur()
