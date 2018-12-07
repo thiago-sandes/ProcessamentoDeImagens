@@ -1,0 +1,8 @@
+def testeConvolve(file):
+    import welerson_augusto as w
+    img = w.imreadgray(file)
+    k = [[-1,-1,-1], [-1,8, -1], [-1,-1,-1]]
+    ans = w.convolve(img, k)
+s)
+
+

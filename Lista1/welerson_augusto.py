@@ -60,9 +60,9 @@ def imreadgray(file):
 
 def imshow(img):
 	if nchannels(img) == 1:
-		plt.imshow(img, cmap='gray')
+		plt.imshow(img, cmap='gray', vmin = 0, vmax = 255)
 	else:
-		plt.imshow(img)
+		plt.imshow(img, vmin = 0, vmax = 255)
 	plt.show()
 
 def thresh(img, limiar):
@@ -94,7 +94,11 @@ def negative(img):
 	return 255 - img;
 
 def contrast(img, r, m):
-	return r * (img - m) + m
+	out = r * (img - m) + m
+	out = [[255 if x > 255 else x for x in arr] for arr in out]
+	out = [[0 if x < 0 else x for x in arr] for arr in out]
+	
+	return np.asarray(out, np.uint8)
 	
 def hist(img):
 	if nchannels(img) == 1:
@@ -142,7 +146,10 @@ def showhist(h, Bin = 1):
 
 def histeq(img):
 	#Imagem de entrada
-	imshow(img)
+	#imshow(img)
+	
+	###### REFAZER, ESTÁ SATURANDO A IMAGEM, VER O PQ DISSO
+	
 	data = img.copy().flatten()
 	hist, bins = np.histogram(data, 256, density=True)
 	cdf = hist.cumsum()
@@ -150,35 +157,46 @@ def histeq(img):
 	img_eq = np.interp(data, bins[:-1], cdf)
 	imgOut = np.asarray(img_eq.reshape(img.shape), np.uint8)
 	#Imagem de saida
- 	imshow(imgOut)
+ 	#imshow(imgOut)
 	return imgOut
-
-def convolve(img,kernel):
-	kernel = kernel[:, :, None]
-	out = []
-	imshow(img)
 	
-	for indexs,value in np.ndenumerate(img):
-
-		out += img[indexs] * kernel[indexs]
-
-	out = (out % 255)
-	imshow(out)
-
-	return out
-
+def convolve(img, kernel):
+	# para imagens grays por enquanto, adaptar	e fazer map para os valores ficarem no range [0,255]
+	Sx, Sy = size(img)
+	
+	a = len(kernel)
+	b = len(kernel[0])
+	a2 = int(a/2)
+	b2 = int(b/2)
+	outAux = np.zeros((Sy, Sx), np.float64)
+	
+	for i in range(Sy):
+		for j in range(Sx):
+			g = 0.0
+			for s in range(a):
+				for t in range(b):
+					x = j+t-a2
+					y = i+s-b2
+					x = min(max(x, 0), Sx-1)
+					y = min(max(y, 0), Sy-1)
+					g += (kernel[s][t] * img[y][x])
+			outAux[i][j] = g
+	
+	#Se for simplesmente saturar valores fora do range [0,255]
+	#outAux = [[255 if x > 255 else x for x in arr] for arr in outAux]
+	#outAux = [[0 if x < 0 else x for x in arr] for arr in outAux]
+	#return np.asarray(outAux, np.uint8)
+	
+	#Se for fazer remapeamento para 0,255
+	outAux = np.interp(outAux, (outAux.min(), outAux.max()), (0, 255))
+	return outAux
 
 def maskBlur():
-	return np.asarray([[1/16,2/16,1/16],[2/16,4/16,2/16],[1/16,2/16,1/16]], np.float64)
+	return [[1/16,2/16,1/16],[2/16,4/16,2/16],[1/16,2/16,1/16]]
 
 def blur(img):
-	imshow(img)
-	img_new = img * maskBlur()
-
-	#img_new = convolve(img, maskBlur())
-
-	imshow(img_new)
-	return img_new
+	kernel = maskBlur()
+	return convolve(img, kernel)
 
 def seSquare3():
 	return np.asarray([[1,1,1],[1,1,1],[1,1,1]], np.uint8)
@@ -239,3 +257,7 @@ img1Gray = rgb2gray(img1)
 
 # Q16
 #maskBlur()
+
+
+#LEMBRAR: TESTAR SE ALGUMA FUNCAO ESTÁ MODIFICANDO A IMG DE ENTRADA
+# LEMBRAR: ver se em alguma função os valores estão passando de 255 ou 0 e saturar
