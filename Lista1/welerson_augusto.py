@@ -12,12 +12,8 @@
 
 
 '''
-
 Lista 1 para a disciplina Processamento de Imagens . . .
-
 Periodo 2018-2
-
-
 '''
 
 
@@ -148,7 +144,7 @@ def histeq(img):
 	#Imagem de entrada
 	#imshow(img)
 	
-	###### REFAZER, ESTÁ SATURANDO A IMAGEM, VER O PQ DISSO
+	###### REFAZER, ESTA SATURANDO A IMAGEM, VER O PQ DISSO
 	
 	data = img.copy().flatten()
 	hist, bins = np.histogram(data, 256, density=True)
@@ -203,6 +199,149 @@ def seSquare3():
 
 def seCross3():
 	return np.asarray([[0,1,0],[1,1,1],[0,1,0]], np.uint8)
+
+def erode(img, structure):
+	img.setflags(write=1)
+	out = img
+	rows, cols, channels = img.shape
+	rowSruct, colStruct = structure.shape
+	auxArrayB = np.zeros(structure.shape)
+	auxArrayG = np.zeros(structure.shape)
+	auxArrayR= np.zeros(structure.shape)
+	b, g, r    = out[:, :, 0], out[:, :, 1], out[:, :, 2]
+	
+	## Iterate over each cell
+	for row in range(rows):
+		for col in range(cols):
+			try:
+				auxArrayB[0][0] = b[row - 1 ][col - 1]
+			except:
+				auxArrayB[0][0] = auxArrayB[0][0] = b[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayB[0][1] = b[row - 1 ][col]
+			except:
+				auxArrayB[0][1] = b[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayB[0][2] = b[row - 1 ][col + 1]
+			except:
+				auxArrayB[0][2] = b[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayB[1][0] = b[row][col - 1]
+			except:
+				auxArrayB[1][0] = b[np.clip((row), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayB[1][1] = b[row][col]
+			except:
+				auxArrayB[1][1] = b[np.clip((row), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayB[1][2] = b[row][col + 1]
+			except:
+				auxArrayB[1][2] = b[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayB[2][0] = b[row + 1][col - 1]
+			except:
+				auxArrayB[2][0] = b[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayB[2][1] = b[row + 1][col]
+			except:
+				auxArrayB[2][1] = b[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayB[2][2] = b[row + 1][col + 1]
+			except:
+				auxArrayB[2][2] = b[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
+
+			try:
+				auxArrayG[0][0] = g[row - 1 ][col - 1]
+			except:
+				auxArrayG[0][0] = g[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayG[0][1] = g[row - 1 ][col]
+			except:
+				auxArrayG[0][1] = g[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayG[0][2] = g[row - 1 ][col + 1]
+			except:
+				auxArrayG[0][2] = g[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayG[1][0] = g[row][col - 1]
+			except:
+				auxArrayG[1][0] = g[np.clip((row), row, rows)][np.clip((col - 1), 0, cols)]
+			try:
+				auxArrayG[1][1] = g[row][col]
+			except:
+				auxArrayG[1][1] = g[np.clip((row), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayG[1][2] = g[row][col + 1]
+			except:
+				auxArrayG[1][2] = g[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayG[2][0] = g[row + 1][col - 1]
+			except:
+				auxArrayG[2][0] = g[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayG[2][1] = g[row + 1][col]
+			except:
+				auxArrayG[2][1] = g[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayG[2][2] = g[row + 1][col + 1]
+			except:
+				auxArrayG[2][2] = g[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
+
+			try:
+				auxArrayR[0][0] = r[row - 1][col - 1]
+			except:
+				auxArrayR[0][0] = r[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayR[0][1] = r[row - 1][col]
+			except:
+				auxArrayR[0][1] = r[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayR[0][2] = r[row - 1][col + 1]
+			except:
+				auxArrayR[0][2] = r[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayR[1][0] = r[row][col - 1]
+			except:
+				auxArrayR[1][0] = r[np.clip((row), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayR[1][1] = r[row][col]
+			except:
+				auxArrayR[1][1] = r[np.clip((row), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayR[1][2] = r[row][col + 1]
+			except:
+				auxArrayR[1][2] = r[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
+			try:
+				auxArrayR[2][0] = r[row + 1][col - 1]
+			except:
+				auxArrayR[2][0] = r[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
+			try:
+				auxArrayR[2][1] = r[row + 1][col]
+			except:
+				auxArrayR[2][1] = r[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
+			try:
+				auxArrayR[2][2] = r[row + 1][col + 1] 
+			except:
+				auxArrayR[2][2] = r[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
+
+			listaAuxB = []
+			listaAuxG = []
+			listaAuxR = []
+			for rowSt in range(rowSruct):
+				for colSt in range(colStruct):
+						if(structure[rowSt][colSt] == 1):
+							listaAuxB.append(auxArrayB[rowSt][colSt])
+							listaAuxG.append(auxArrayB[rowSt][colSt])
+							listaAuxR.append(auxArrayR[rowSt][colSt])
+							
+
+			b[row][col] = min(listaAuxB)
+			g[row][col] = min(listaAuxG)
+			r[row][col] = min(listaAuxR)
+
+	erosion = np.dstack((b,g,r))
+	erosion = erosion.astype(np.uint8)
+	return erosion
 
 ######### testes ############
 #img1 = imread('in1.jpg')
@@ -259,5 +398,5 @@ img1Gray = rgb2gray(img1)
 #maskBlur()
 
 
-#LEMBRAR: TESTAR SE ALGUMA FUNCAO ESTÁ MODIFICANDO A IMG DE ENTRADA
-# LEMBRAR: ver se em alguma função os valores estão passando de 255 ou 0 e saturar
+#LEMBRAR: TESTAR SE ALGUMA FUNCAO ESTA MODIFICANDO A IMG DE ENTRADA
+# LEMBRAR: ver se em alguma funcao os valores estao passando de 255 ou 0 e saturar
