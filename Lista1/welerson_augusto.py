@@ -209,120 +209,27 @@ def erode(img, structure):
 	auxArrayG = np.zeros(structure.shape)
 	auxArrayR= np.zeros(structure.shape)
 	b, g, r    = out[:, :, 0], out[:, :, 1], out[:, :, 2]
-	
+	b = np.reshape(b, (rows, cols))
+	g = np.reshape(g, (rows, cols))
+	r = np.reshape(r, (rows, cols))
+	print(auxArrayB)
+	aa = len(structure)
+	bb = len(structure[0])
+	a2 = int(aa/2)
+	b2 = int(bb/2)
+	print(b)
 	## Iterate over each cell
 	for row in range(rows):
 		for col in range(cols):
-			try:
-				auxArrayB[0][0] = b[row - 1 ][col - 1]
-			except:
-				auxArrayB[0][0] = auxArrayB[0][0] = b[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayB[0][1] = b[row - 1 ][col]
-			except:
-				auxArrayB[0][1] = b[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayB[0][2] = b[row - 1 ][col + 1]
-			except:
-				auxArrayB[0][2] = b[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayB[1][0] = b[row][col - 1]
-			except:
-				auxArrayB[1][0] = b[np.clip((row), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayB[1][1] = b[row][col]
-			except:
-				auxArrayB[1][1] = b[np.clip((row), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayB[1][2] = b[row][col + 1]
-			except:
-				auxArrayB[1][2] = b[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayB[2][0] = b[row + 1][col - 1]
-			except:
-				auxArrayB[2][0] = b[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayB[2][1] = b[row + 1][col]
-			except:
-				auxArrayB[2][1] = b[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayB[2][2] = b[row + 1][col + 1]
-			except:
-				auxArrayB[2][2] = b[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
-
-			try:
-				auxArrayG[0][0] = g[row - 1 ][col - 1]
-			except:
-				auxArrayG[0][0] = g[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayG[0][1] = g[row - 1 ][col]
-			except:
-				auxArrayG[0][1] = g[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayG[0][2] = g[row - 1 ][col + 1]
-			except:
-				auxArrayG[0][2] = g[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayG[1][0] = g[row][col - 1]
-			except:
-				auxArrayG[1][0] = g[np.clip((row), row, rows)][np.clip((col - 1), 0, cols)]
-			try:
-				auxArrayG[1][1] = g[row][col]
-			except:
-				auxArrayG[1][1] = g[np.clip((row), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayG[1][2] = g[row][col + 1]
-			except:
-				auxArrayG[1][2] = g[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayG[2][0] = g[row + 1][col - 1]
-			except:
-				auxArrayG[2][0] = g[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayG[2][1] = g[row + 1][col]
-			except:
-				auxArrayG[2][1] = g[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayG[2][2] = g[row + 1][col + 1]
-			except:
-				auxArrayG[2][2] = g[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
-
-			try:
-				auxArrayR[0][0] = r[row - 1][col - 1]
-			except:
-				auxArrayR[0][0] = r[np.clip((row - 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayR[0][1] = r[row - 1][col]
-			except:
-				auxArrayR[0][1] = r[np.clip((row - 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayR[0][2] = r[row - 1][col + 1]
-			except:
-				auxArrayR[0][2] = r[np.clip((row - 1), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayR[1][0] = r[row][col - 1]
-			except:
-				auxArrayR[1][0] = r[np.clip((row), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayR[1][1] = r[row][col]
-			except:
-				auxArrayR[1][1] = r[np.clip((row), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayR[1][2] = r[row][col + 1]
-			except:
-				auxArrayR[1][2] = r[np.clip((row), row, rows)][np.clip((col + 1), col, cols)]
-			try:
-				auxArrayR[2][0] = r[row + 1][col - 1]
-			except:
-				auxArrayR[2][0] = r[np.clip((row + 1), row, rows)][np.clip((col - 1), col, cols)]
-			try:
-				auxArrayR[2][1] = r[row + 1][col]
-			except:
-				auxArrayR[2][1] = r[np.clip((row + 1), row, rows)][np.clip((col), col, cols)]
-			try:
-				auxArrayR[2][2] = r[row + 1][col + 1] 
-			except:
-				auxArrayR[2][2] = r[np.clip((row + 1), row, rows)][np.clip((col + 1), col, cols)]
+			for s in range(aa):
+				for t in range(bb):
+					x = col+t-a2
+					y = row+s-b2
+					x = min(max(x, 0), cols-1)
+					y = min(max(y, 0), rows-1)
+					auxArrayB[s][t] = b[y][x]
+					auxArrayG[s][t] = g[y][x]
+					auxArrayR[s][t] = r[y][x]
 
 			listaAuxB = []
 			listaAuxG = []
