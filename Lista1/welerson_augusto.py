@@ -10,32 +10,29 @@
 #
 ########################################
 
-
-'''
-Lista 1 para a disciplina Processamento de Imagens . . .
-Periodo 2018-2
-'''
-
-
 import matplotlib 
 import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+#Q2
 def imread(file):
     img = mpimg.imread(file)
     return np.asarray(img, np.uint8)
 
+#Q3
 def nchannels(img):
 	if len(img.shape) == 2:
 		return 1
 	return len(img.shape)
 
+#Q4
 def size(img):
 		x, y = img.shape[0], img.shape[1]
 		return [y, x]
 
+#Q5
 def rgb2gray(img):
 	x, y = size(img)
 	ans = np.zeros((y, x), np.uint8)
@@ -48,12 +45,14 @@ def rgb2gray(img):
 			
 	return ans
 
+#Q6
 def imreadgray(file):
 	img = imread(file)
 	if nchannels(img) == 1:
 		return img
 	return rgb2gray(img)
 
+#Q7
 def imshow(img):
 	if nchannels(img) == 1:
 		plt.imshow(img, cmap='gray', vmin = 0, vmax = 255)
@@ -61,6 +60,7 @@ def imshow(img):
 		plt.imshow(img, vmin = 0, vmax = 255)
 	plt.show()
 
+#Q8
 def thresh(img, limiar):
 	imgOut = []
 	if nchannels(img) == 1:
@@ -86,16 +86,19 @@ def thresh(img, limiar):
 			imgOut.append(line)
 	return np.asarray(imgOut, np.uint8)
 
+#Q9
 def negative(img):
 	return 255 - img;
 
+#Q10
 def contrast(img, r, m):
 	out = r * (img - m) + m
 	out = [[255 if x > 255 else x for x in arr] for arr in out]
 	out = [[0 if x < 0 else x for x in arr] for arr in out]
 	
 	return np.asarray(out, np.uint8)
-	
+
+#Q11
 def hist(img):
 	if nchannels(img) == 1:
 		h = [0 for _ in range(256)]
@@ -112,6 +115,7 @@ def hist(img):
 				h[2][p[2]]+=1
 		return h
 
+#Q12 e Q13
 def showhist(h, Bin = 1):
 	if len(h) != 3:
 		x = [sum(h[i : i+Bin])/Bin*1. for i in range(0, 256, Bin)]
@@ -140,6 +144,7 @@ def showhist(h, Bin = 1):
 		ax1.bar3d(xpos, ypos, zpos, dx, dy, dz, color = 'red')
 		plt.show()
 
+#Q14
 def histeq(img):
 	#Imagem de entrada
 	#imshow(img)
@@ -155,7 +160,8 @@ def histeq(img):
 	#Imagem de saida
  	#imshow(imgOut)
 	return imgOut
-	
+
+#Q15
 def convolve(img, kernel):
 	# para imagens grays por enquanto, adaptar	e fazer map para os valores ficarem no range [0,255]
 	Sx, Sy = size(img)
@@ -187,19 +193,24 @@ def convolve(img, kernel):
 	outAux = np.interp(outAux, (outAux.min(), outAux.max()), (0, 255))
 	return outAux
 
+#Q16
 def maskBlur():
 	return [[1/16,2/16,1/16],[2/16,4/16,2/16],[1/16,2/16,1/16]]
 
+#Q17
 def blur(img):
 	kernel = maskBlur()
 	return convolve(img, kernel)
 
+#Q18
 def seSquare3():
 	return np.asarray([[1,1,1],[1,1,1],[1,1,1]], np.uint8)
 
+#Q19
 def seCross3():
 	return np.asarray([[0,1,0],[1,1,1],[0,1,0]], np.uint8)
 
+#Q20
 def erode(img, structure):
 	img.setflags(write=1)
 	out = img
@@ -251,6 +262,7 @@ def erode(img, structure):
 	return erosion
 
 ######### testes ############
+#Q1
 #img1 = imread('in1.jpg')
 #print (type(img1))
 
