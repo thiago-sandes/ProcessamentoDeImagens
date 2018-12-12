@@ -146,31 +146,35 @@ def showhist(h, Bin = 1):
 
 #Q14
 def histeq(img):
-	#Imagem de entrada
-	#imshow(img)
+	h = hist(img)
+	Sx, Sy = size(img)
+	n = Sx * Sy * 1.0
+	p = [h[i]/n for i in range(256)]
+	cdf = [p[0]]
+	for i in range(1, 256):
+		cdf.append((cdf[i-1] + p[i]))
 	
-	###### REFAZER, ESTA SATURANDO A IMAGEM, VER O PQ DISSO
+	cdf = [x*255 for x in cdf]
 	
-	data = img.copy().flatten()
-	hist, bins = np.histogram(data, 256, density=True)
-	cdf = hist.cumsum()
-	cdf = 255*cdf/cdf[-1]
-	img_eq = np.interp(data, bins[:-1], cdf)
-	imgOut = np.asarray(img_eq.reshape(img.shape), np.uint8)
-	#Imagem de saida
- 	#imshow(imgOut)
-	return imgOut
+	cdf = [255 if x > 255 else int(x) for x in cdf]
+	cdf = [0 if x < 0 else int(x) for x in cdf]
+	
+	out = np.zeros((Sy, Sx), np.uint8)
+	
+	for i in range(Sy):
+		for j in range(Sx):
+			out[i][j] = cdf[img[i][j]]
+	return out
 
 #Q15
 def convolve(img, kernel):
-	# para imagens grays por enquanto, adaptar	e fazer map para os valores ficarem no range [0,255]
 	Sx, Sy = size(img)
 	
 	a = len(kernel)
 	b = len(kernel[0])
 	a2 = int(a/2)
 	b2 = int(b/2)
-	outAux = np.zeros((Sy, Sx), np.float64)
+	outAux = np.zeros((Sy, Sx), np.int32)
 	
 	for i in range(Sy):
 		for j in range(Sx):
@@ -182,16 +186,12 @@ def convolve(img, kernel):
 					x = min(max(x, 0), Sx-1)
 					y = min(max(y, 0), Sy-1)
 					g += (kernel[s][t] * img[y][x])
-			outAux[i][j] = g
+			outAux[i][j] = abs(int(g))
 	
-	#Se for simplesmente saturar valores fora do range [0,255]
-	#outAux = [[255 if x > 255 else x for x in arr] for arr in outAux]
-	#outAux = [[0 if x < 0 else x for x in arr] for arr in outAux]
-	#return np.asarray(outAux, np.uint8)
+	out = [[255 if x > 255 else x for x in arr] for arr in outAux]
+	out = [[0 if x < 0 else x for x in arr] for arr in out]
 	
-	#Se for fazer remapeamento para 0,255
-	outAux = np.interp(outAux, (outAux.min(), outAux.max()), (0, 255))
-	return outAux
+	return np.asarray(out, np.uint8)
 
 #Q16
 def maskBlur():
@@ -204,118 +204,58 @@ def blur(img):
 
 #Q18
 def seSquare3():
-	return np.asarray([[1,1,1],[1,1,1],[1,1,1]], np.uint8)
+	return [[1,1,1],[1,1,1],[1,1,1]]
 
 #Q19
 def seCross3():
-	return np.asarray([[0,1,0],[1,1,1],[0,1,0]], np.uint8)
+	return [[0,1,0],[1,1,1],[0,1,0]]
 
+#initG = 256 quando f for min e 0 quando f for max
+def morfologicOp(img, structure, initG, f):
+	Sx, Sy = size(img)
+	numCh = nchannels(img)
+	a = len(structure)
+	b = len(structure[0])
+	a2 = int(a/2)
+	b2 = int(b/2)
+	if numCh == 1 :
+		out = np.zeros((Sy, Sx), np.uint8)
+	else :
+		out = np.zeros((Sy, Sx, 3), np.uint8)
+	
+	for i in range(Sy):
+		for j in range(Sx):
+			if numCh == 1 :
+				g = initG
+			else :
+				g = [initG, initG, initG]
+			for s in range(a):
+				for t in range(b):
+					x = j+t-a2
+					y = i+s-b2
+					x = min(max(x, 0), Sx-1)
+					y = min(max(y, 0), Sy-1)
+					if structure[s][t] == 1 :
+						if numCh == 1 :
+							g = f(img[y][x], g)
+						else :
+							g = [f(img[y][x][0], g[0]), f(img[y][x][1], g[1]), f(img[y][x][2], g[2])]
+			out[i][j] = g
+	
+	return out
+	
 #Q20
 def erode(img, structure):
-	img.setflags(write=1)
-	out = img
-	rows, cols, channels = img.shape
-	rowSruct, colStruct = structure.shape
-	auxArrayB = np.zeros(structure.shape)
-	auxArrayG = np.zeros(structure.shape)
-	auxArrayR= np.zeros(structure.shape)
-	b, g, r    = out[:, :, 0], out[:, :, 1], out[:, :, 2]
-	b = np.reshape(b, (rows, cols))
-	g = np.reshape(g, (rows, cols))
-	r = np.reshape(r, (rows, cols))
-	print(auxArrayB)
-	aa = len(structure)
-	bb = len(structure[0])
-	a2 = int(aa/2)
-	b2 = int(bb/2)
-	print(b)
-	## Iterate over each cell
-	for row in range(rows):
-		for col in range(cols):
-			for s in range(aa):
-				for t in range(bb):
-					x = col+t-a2
-					y = row+s-b2
-					x = min(max(x, 0), cols-1)
-					y = min(max(y, 0), rows-1)
-					auxArrayB[s][t] = b[y][x]
-					auxArrayG[s][t] = g[y][x]
-					auxArrayR[s][t] = r[y][x]
+	#OBS: Considerando que o centro do elemento estruturante é sempre o centro do retagunlo que ele está inscrito
+	return morfologicOp(img, structure, 255, min)
 
-			listaAuxB = []
-			listaAuxG = []
-			listaAuxR = []
-			for rowSt in range(rowSruct):
-				for colSt in range(colStruct):
-						if(structure[rowSt][colSt] == 1):
-							listaAuxB.append(auxArrayB[rowSt][colSt])
-							listaAuxG.append(auxArrayB[rowSt][colSt])
-							listaAuxR.append(auxArrayR[rowSt][colSt])
-							
-
-			b[row][col] = min(listaAuxB)
-			g[row][col] = min(listaAuxG)
-			r[row][col] = min(listaAuxR)
-
-	erosion = np.dstack((b,g,r))
-	erosion = erosion.astype(np.uint8)
-	return erosion
-
-######### testes ############
-#Q1
-#img1 = imread('in1.jpg')
-#print (type(img1))
-
-'''
-# Q2 printing image
-plt.imshow(img1)
-#plt.show()
-# Q3 pegando numero de canais
-nCh = nchannels(img1)
-print (nCh)
-# Q4 
-print (size(img1))
-# Q5
-img1Gray = rgb2gray(img1)
-'''
-# Q6
-#img2 = imreadgray('in1.jpg')
-
-# Q7 imshow()
-#imshow(img1)
-#imshow(img2)
-
-# Q8 threshold
-#imgT = thresh(img2, 200)
-#imgT = thresh(img1, [100, 250, 250])
-#imshow(imgT)
-
-# Q9 
-#imshow(negative(img1))
-
-# Q10
-#imshow(contrast(img2, 4, 20))
-
-# Q11
-#h = hist(img1)
-
-# Q12 e Q13
-#showhist(h)
-#showhist(h, 2)
-
-# Q14
-#img1 = imread('in1.jpg')
-#histeq(img1)
-
-# Q15
-# http://aishack.in/tutorials/image-convolution-examples/
-#img = imread('cinza.jpg')
-#kernel = np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]]) # Filtro Edge Detection 
-#convolve(img, kernel)
-
-# Q16
-#maskBlur()
-
-
-#LEMBRAR: TESTAR SE ALGUMA FUNCAO ESTA MODIFICANDO A IMG DE ENTRADA
-# LEMBRAR: ver se em alguma funcao os valores estao passando de 255 ou 0 e saturar
+#Q21
+def dilate(img, structure):
+	a = len(structure)
+	b = len(structure[0])
+	structAux = [[0 for _ in range(b)] for _ in range(a)]
+	for i in range(a):
+		for j in range(b):
+			structAux[i][j] = structure[a-1-i][b-1-j]
+			
+	return morfologicOp(img, structure, 0, max)
